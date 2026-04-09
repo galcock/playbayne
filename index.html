@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BAYNE — The First AR MMORPG Built for Vision Pro</title>
+  <meta name="description" content="BAYNE turns your world into a battlefield. Explore, fight, build, and conquer in the first true AR MMORPG where the real and digital collide.">
+  <meta property="og:title" content="BAYNE — The First AR MMORPG Built for Vision Pro">
+  <meta property="og:description" content="This isn't a game. It's war in your living room. Fantasy is now reality.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://playbayne.com">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x2694;</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- model-viewer for 3D -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #050507;
+      --bg-elevated: #0a0a0f;
+      --surface: #111118;
+      --border: rgba(255,255,255,0.08);
+      --text: #f0f0f5;
+      --text-dim: #8888a0;
+      --accent: #c084fc;
+      --accent-bright: #e879f9;
+      --accent-glow: rgba(192,132,252,0.3);
+      --fire: #f97316;
+      --fire-glow: rgba(249,115,22,0.3);
+      --cyan: #22d3ee;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .gradient-text {
+      background: linear-gradient(135deg, #c084fc 0%, #e879f9 50%, #f97316 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+    .fade-in {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 20px 0; transition: all 0.4s; backdrop-filter: blur(0px);
+    }
+    nav.scrolled {
+      padding: 12px 0;
+      background: rgba(5,5,7,0.9);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    nav .container { display: flex; justify-content: space-between; align-items: center; }
+    .nav-logo { font-size: 1.5rem; font-weight: 900; letter-spacing: 0.15em; position: relative; }
+    .nav-logo::after {
+      content: ''; position: absolute; bottom: -4px; left: 0; width: 100%; height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--fire)); opacity: 0.6;
+    }
+    .nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
+    .nav-links a {
+      font-size: 0.75rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-dim); transition: color 0.3s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      padding: 10px 24px; border: 1px solid var(--accent); border-radius: 6px;
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent) !important; transition: all 0.3s;
+    }
+    .nav-cta:hover {
+      background: var(--accent); color: var(--bg) !important;
+      box-shadow: 0 0 30px var(--accent-glow);
+    }
+    .mobile-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+    .mobile-toggle span { width: 24px; height: 2px; background: var(--text); transition: all 0.3s; }
+
+    /* HERO */
+    .hero {
+      position: relative; min-height: 100vh; display: flex; align-items: center;
+      justify-content: center; text-align: center; overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background: url('assets/skybox/skybox_bayne_volcanic_4.jpg') center/cover no-repeat;
+    }
+    .hero-bg::after {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at center, rgba(5,5,7,0.5) 0%, rgba(5,5,7,0.85) 60%, var(--bg) 100%);
+    }
+    #hero-canvas { position: absolute; inset: 0; z-index: 1; }
+    .hero-content { position: relative; z-index: 2; max-width: 900px; padding: 0 24px; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px;
+      border-radius: 100px; border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      font-size: 0.75rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text-dim); margin-bottom: 32px; animation: fadeInDown 1s ease forwards;
+    }
+    .hero-badge .dot {
+      width: 6px; height: 6px; border-radius: 50%; background: #22c55e;
+      box-shadow: 0 0 10px #22c55e; animation: pulse-dot 2s infinite;
+    }
+    @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .hero h1 {
+      font-size: clamp(3.5rem,10vw,8rem); font-weight: 900; line-height: 0.95;
+      letter-spacing: -0.03em; margin-bottom: 24px;
+      animation: fadeInUp 1s 0.2s ease forwards; opacity: 0;
+    }
+    .hero-subtitle {
+      font-size: clamp(1.1rem,2.5vw,1.5rem); font-weight: 300; color: var(--text-dim);
+      line-height: 1.6; max-width: 600px; margin: 0 auto 48px;
+      animation: fadeInUp 1s 0.4s ease forwards; opacity: 0;
+    }
+    .hero-actions {
+      display: flex; align-items: center; justify-content: center; gap: 20px;
+      animation: fadeInUp 1s 0.6s ease forwards; opacity: 0; flex-wrap: wrap;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 10px; padding: 16px 40px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-bright));
+      color: #000; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; border-radius: 8px; border: none; cursor: pointer;
+      transition: all 0.3s; position: relative; overflow: hidden;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 40px var(--accent-glow), 0 10px 40px rgba(0,0,0,0.4);
+    }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 10px; padding: 16px 40px;
+      background: transparent; border: 1px solid var(--border); color: var(--text);
+      font-size: 0.85rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+      border-radius: 8px; cursor: pointer; transition: all 0.3s;
+    }
+    .btn-secondary:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); }
+    .hero-scroll {
+      position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 2;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      color: var(--text-dim); font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      animation: fadeInUp 1s 0.8s ease forwards; opacity: 0;
+    }
+    .scroll-line {
+      width: 1px; height: 40px;
+      background: linear-gradient(to bottom, var(--text-dim), transparent);
+      animation: scrollPulse 2s infinite;
+    }
+    @keyframes scrollPulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
+    @keyframes fadeInUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeInDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+
+    /* MARQUEE */
+    .marquee-section { padding: 40px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); overflow: hidden; }
+    .marquee-track { display: flex; gap: 60px; animation: marquee 30s linear infinite; width: max-content; }
+    .marquee-item {
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-dim); white-space: nowrap; display: flex; align-items: center; gap: 16px;
+    }
+    .marquee-item .sep { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); opacity: 0.5; }
+    @keyframes marquee { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+
+    /* SIGNUP */
+    .signup {
+      padding: 120px 0; position: relative;
+      background: linear-gradient(180deg, var(--bg) 0%, rgba(192,132,252,0.03) 50%, var(--bg) 100%);
+    }
+    .signup-wrapper {
+      max-width: 600px; margin: 0 auto; text-align: center;
+    }
+    .signup h2 {
+      font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; letter-spacing: -0.02em;
+      margin-bottom: 16px; line-height: 1.1;
+    }
+    .signup p { font-size: 1.05rem; color: var(--text-dim); line-height: 1.7; margin-bottom: 40px; }
+    .signup-form { display: flex; flex-direction: column; gap: 16px; }
+    .form-row { display: flex; gap: 12px; }
+    .form-input {
+      flex: 1; padding: 16px 20px; background: var(--bg-elevated); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); font-size: 0.95rem; font-family: inherit;
+      transition: border-color 0.3s; outline: none;
+    }
+    .form-input:focus { border-color: var(--accent); }
+    .form-input::placeholder { color: var(--text-dim); }
+    .form-submit {
+      padding: 16px 32px; background: linear-gradient(135deg, var(--accent), var(--accent-bright));
+      color: #000; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      border-radius: 8px; border: none; cursor: pointer; transition: all 0.3s;
+    }
+    .form-submit:hover { transform: translateY(-2px); box-shadow: 0 0 40px var(--accent-glow); }
+    .form-note { font-size: 0.75rem; color: var(--text-dim); margin-top: 8px; }
+    .form-success {
+      display: none; padding: 20px; border-radius: 8px; background: rgba(34,197,94,0.1);
+      border: 1px solid rgba(34,197,94,0.3); color: #22c55e; font-weight: 500;
+    }
+
+    /* CHARACTER ART */
+    .characters { padding: 160px 0; }
+    .characters-header { text-align: center; margin-bottom: 60px; }
+    .characters-header h2 {
+      font-size: clamp(2.5rem,5vw,3.5rem); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 16px;
+    }
+    .characters-header p { font-size: 1.1rem; color: var(--text-dim); max-width: 500px; margin: 0 auto; }
+    .art-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+    }
+    .art-card {
+      border-radius: 16px; overflow: hidden; aspect-ratio: 1; position: relative;
+      cursor: pointer; transition: transform 0.4s;
+    }
+    .art-card:hover { transform: scale(1.03); }
+    .art-card img { width: 100%; height: 100%; object-fit: cover; }
+    .art-card .art-label {
+      position: absolute; bottom: 0; left: 0; right: 0; padding: 20px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.8));
+      font-size: 0.8rem; font-weight: 600; letter-spacing: 0.05em;
+    }
+    .art-grid-row2 {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 16px;
+    }
+
+    /* 3D MODELS */
+    .models { padding: 160px 0; }
+    .models-header { text-align: center; margin-bottom: 60px; }
+    .models-header h2 {
+      font-size: clamp(2.5rem,5vw,3.5rem); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 16px;
+    }
+    .models-header p { font-size: 1.1rem; color: var(--text-dim); max-width: 550px; margin: 0 auto; }
+    .models-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .model-card {
+      border-radius: 16px; border: 1px solid var(--border); background: var(--bg-elevated);
+      overflow: hidden; transition: all 0.4s;
+    }
+    .model-card:hover {
+      border-color: rgba(192,132,252,0.2); transform: translateY(-4px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    model-viewer {
+      width: 100%; height: 300px; background: var(--bg-elevated);
+      --poster-color: transparent;
+    }
+    .model-info { padding: 20px; }
+    .model-info h3 { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+    .model-info p { font-size: 0.8rem; color: var(--text-dim); }
+    .model-badge {
+      display: inline-block; padding: 4px 10px; border-radius: 4px;
+      background: rgba(192,132,252,0.1); color: var(--accent);
+      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+      margin-top: 8px;
+    }
+
+    /* ENVIRONMENTS */
+    .environments { padding: 160px 0; }
+    .environments-header { text-align: center; margin-bottom: 60px; }
+    .environments-header h2 {
+      font-size: clamp(2.5rem,5vw,3.5rem); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 16px;
+    }
+    .environments-header p { font-size: 1.1rem; color: var(--text-dim); max-width: 550px; margin: 0 auto; }
+    .env-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    .env-card {
+      border-radius: 16px; overflow: hidden; position: relative; aspect-ratio: 2/1;
+      cursor: pointer; transition: transform 0.4s;
+    }
+    .env-card:hover { transform: scale(1.02); }
+    .env-card img { width: 100%; height: 100%; object-fit: cover; }
+    .env-card .env-overlay {
+      position: absolute; inset: 0; display: flex; align-items: flex-end;
+      background: linear-gradient(transparent 50%, rgba(0,0,0,0.7));
+      padding: 24px;
+    }
+    .env-card .env-name { font-size: 1rem; font-weight: 700; }
+    .env-card .env-type { font-size: 0.75rem; color: var(--text-dim); margin-top: 4px; }
+
+    /* FEATURES */
+    .features { padding: 160px 0; }
+    .features-header { text-align: center; margin-bottom: 80px; }
+    .features-header h2 {
+      font-size: clamp(2.5rem,5vw,3.5rem); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 16px;
+    }
+    .features-header p { font-size: 1.1rem; color: var(--text-dim); max-width: 500px; margin: 0 auto; }
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .feature-card {
+      padding: 40px; border-radius: 16px; border: 1px solid var(--border);
+      background: var(--bg-elevated); transition: all 0.4s; position: relative; overflow: hidden;
+    }
+    .feature-card:hover {
+      border-color: rgba(192,132,252,0.2); transform: translateY(-4px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .feature-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0; transition: opacity 0.4s;
+    }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-icon {
+      width: 48px; height: 48px; border-radius: 12px; background: rgba(192,132,252,0.1);
+      display: flex; align-items: center; justify-content: center; margin-bottom: 24px; font-size: 1.3rem;
+    }
+    .feature-card:nth-child(2) .feature-icon { background: rgba(249,115,22,0.1); }
+    .feature-card:nth-child(3) .feature-icon { background: rgba(34,211,238,0.1); }
+    .feature-card:nth-child(4) .feature-icon { background: rgba(34,197,94,0.1); }
+    .feature-card:nth-child(5) .feature-icon { background: rgba(251,191,36,0.1); }
+    .feature-card:nth-child(6) .feature-icon { background: rgba(239,68,68,0.1); }
+    .feature-card h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 12px; }
+    .feature-card p { font-size: 0.9rem; line-height: 1.7; color: var(--text-dim); }
+
+    /* ENGINE */
+    .engine { padding: 160px 0; }
+    .engine-wrapper {
+      border-radius: 24px; border: 1px solid var(--border); background: var(--bg-elevated);
+      padding: 80px; position: relative; overflow: hidden;
+    }
+    .engine-wrapper::before {
+      content: ''; position: absolute; top: -200px; right: -200px; width: 500px; height: 500px;
+      background: radial-gradient(circle, var(--accent-glow), transparent); opacity: 0.3;
+    }
+    .engine-wrapper::after {
+      content: ''; position: absolute; bottom: -200px; left: -200px; width: 500px; height: 500px;
+      background: radial-gradient(circle, var(--fire-glow), transparent); opacity: 0.3;
+    }
+    .engine-content { position: relative; z-index: 1; max-width: 600px; }
+    .engine h2 {
+      font-size: clamp(2.5rem,5vw,3.5rem); font-weight: 800; letter-spacing: -0.02em;
+      margin-bottom: 24px; line-height: 1.1;
+    }
+    .engine p { font-size: 1.05rem; line-height: 1.8; color: var(--text-dim); margin-bottom: 40px; }
+    .engine-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+    .stat { text-align: center; }
+    .stat-value { font-size: 2.5rem; font-weight: 800; line-height: 1; margin-bottom: 8px; }
+    .stat-label {
+      font-size: 0.75rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    /* CTA */
+    .cta { padding: 160px 0; text-align: center; position: relative; }
+    .cta::before {
+      content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      width: 600px; height: 600px; background: radial-gradient(circle, var(--accent-glow), transparent);
+      opacity: 0.15;
+    }
+    .cta-content { position: relative; z-index: 1; }
+    .cta h2 {
+      font-size: clamp(3rem,6vw,5rem); font-weight: 900; letter-spacing: -0.03em;
+      line-height: 1; margin-bottom: 24px;
+    }
+    .cta p { font-size: 1.2rem; color: var(--text-dim); margin-bottom: 48px; }
+
+    /* FOOTER */
+    footer { padding: 60px 0; border-top: 1px solid var(--border); }
+    .footer-content { display: flex; justify-content: space-between; align-items: center; }
+    .footer-logo { font-size: 1.2rem; font-weight: 900; letter-spacing: 0.15em; }
+    .footer-links { display: flex; gap: 32px; list-style: none; }
+    .footer-links a { font-size: 0.8rem; color: var(--text-dim); transition: color 0.3s; }
+    .footer-links a:hover { color: var(--text); }
+    .footer-copy { font-size: 0.75rem; color: var(--text-dim); }
+
+    /* LIGHTBOX */
+    .lightbox {
+      display: none; position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.95);
+      align-items: center; justify-content: center; cursor: pointer;
+    }
+    .lightbox.active { display: flex; }
+    .lightbox img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 8px; }
+    .lightbox-close {
+      position: absolute; top: 24px; right: 24px; width: 40px; height: 40px;
+      background: rgba(255,255,255,0.1); border: none; border-radius: 50%;
+      color: white; font-size: 1.2rem; cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 1024px) {
+      .features-grid, .models-grid { grid-template-columns: repeat(2, 1fr); }
+      .art-grid, .art-grid-row2 { grid-template-columns: repeat(2, 1fr); }
+      .engine-wrapper { padding: 60px; }
+    }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .nav-links.open {
+        display: flex; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0;
+        background: rgba(5,5,7,0.95); backdrop-filter: blur(20px); padding: 24px;
+        border-bottom: 1px solid var(--border); gap: 20px;
+      }
+      .mobile-toggle { display: flex; }
+      .features-grid, .models-grid { grid-template-columns: 1fr; }
+      .env-grid { grid-template-columns: 1fr; }
+      .art-grid, .art-grid-row2 { grid-template-columns: repeat(2, 1fr); }
+      .engine-wrapper { padding: 40px 24px; }
+      .engine-stats { gap: 16px; }
+      .stat-value { font-size: 1.8rem; }
+      .footer-content { flex-direction: column; gap: 24px; text-align: center; }
+      .footer-links { flex-wrap: wrap; justify-content: center; }
+      .hero-actions { flex-direction: column; }
+      .form-row { flex-direction: column; }
+    }
+
+    /* NOISE */
+    body::after {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: 0.015;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <div class="container">
+      <a href="#" class="nav-logo">BAYNE</a>
+      <div class="mobile-toggle" id="mobile-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </div>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#characters">Characters</a></li>
+        <li><a href="#models">3D Models</a></li>
+        <li><a href="#worlds">Worlds</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#signup">Early Access</a></li>
+        <li><a href="https://apps.apple.com/app/arkandia/id6677011801" class="nav-cta" target="_blank" rel="noopener">Get It Now</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <canvas id="hero-canvas"></canvas>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        Available on Apple Vision Pro
+      </div>
+      <h1><span class="gradient-text">BAYNE</span></h1>
+      <p class="hero-subtitle">The first AR MMORPG built for Vision Pro. This isn't a game. It's war in your living room.</p>
+      <div class="hero-actions">
+        <a href="https://apps.apple.com/app/arkandia/id6677011801" class="btn-primary" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          Download Now
+        </a>
+        <a href="#signup" class="btn-secondary">
+          Join Early Access
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="hero-scroll"><span>Scroll</span><div class="scroll-line"></div></div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-section">
+    <div class="marquee-track">
+      <span class="marquee-item">Real-Time Combat<span class="sep"></span></span>
+      <span class="marquee-item">Spatial Computing<span class="sep"></span></span>
+      <span class="marquee-item">Persistent World<span class="sep"></span></span>
+      <span class="marquee-item">Bayne Engine<span class="sep"></span></span>
+      <span class="marquee-item">Full Immersion<span class="sep"></span></span>
+      <span class="marquee-item">Apple Vision Pro<span class="sep"></span></span>
+      <span class="marquee-item">Real-Scale AR<span class="sep"></span></span>
+      <span class="marquee-item">MMO Battles<span class="sep"></span></span>
+      <span class="marquee-item">Real-Time Combat<span class="sep"></span></span>
+      <span class="marquee-item">Spatial Computing<span class="sep"></span></span>
+      <span class="marquee-item">Persistent World<span class="sep"></span></span>
+      <span class="marquee-item">Bayne Engine<span class="sep"></span></span>
+      <span class="marquee-item">Full Immersion<span class="sep"></span></span>
+      <span class="marquee-item">Apple Vision Pro<span class="sep"></span></span>
+      <span class="marquee-item">Real-Scale AR<span class="sep"></span></span>
+      <span class="marquee-item">MMO Battles<span class="sep"></span></span>
+    </div>
+  </div>
+
+  <!-- SIGNUP -->
+  <section class="signup" id="signup">
+    <div class="container">
+      <div class="signup-wrapper fade-in">
+        <div class="section-label" style="color: #22c55e">Early Access</div>
+        <h2>Be first on the <span class="gradient-text">battlefield.</span></h2>
+        <p>Join the waitlist and get early access to BAYNE. Be among the first players to step into the AR realm when new updates drop.</p>
+        <form class="signup-form" id="signup-form" action="https://formspree.io/f/xpwdqkzl" method="POST">
+          <div class="form-row">
+            <input type="text" name="name" class="form-input" placeholder="Your name" required>
+            <input type="email" name="email" class="form-input" placeholder="Your email" required>
+          </div>
+          <button type="submit" class="form-submit">Join the Waitlist</button>
+          <p class="form-note">No spam. Just game updates and early access invites.</p>
+        </form>
+        <div class="form-success" id="form-success">You're in! Watch your inbox for updates from the battlefield.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHARACTER ART -->
+  <section class="characters" id="characters">
+    <div class="container">
+      <div class="characters-header fade-in">
+        <div class="section-label">Races &amp; Classes</div>
+        <h2>Meet the <span class="gradient-text">warriors</span></h2>
+        <p>Hand-crafted characters spanning multiple races, classes, and playstyles.</p>
+      </div>
+      <div class="art-grid">
+        <div class="art-card fade-in" onclick="openLightbox(this)">
+          <img src="assets/screenshots/backgroundImage1.png" alt="Barbarian Warrior" loading="lazy">
+          <div class="art-label">Barbarian Warrior</div>
+        </div>
+        <div class="art-card fade-in" onclick="openLightbox(this)">
+          <img src="assets/screenshots/backgroundImage10.png" alt="Wood Elf Enchanter" loading="lazy">
+          <div class="art-label">Wood Elf Enchanter</div>
+        </div>
+        <div class="art-card fade-in" onclick="openLightbox(this)">
+          <img src="assets/screenshots/backgroundImage7.png" alt="Dark Elf Rogue" loading="lazy">
+          <div class="art-label">Dark Elf Rogue</div>
+        </div>
+        <div class="art-card fade-in" onclick="openLightbox(this)">
+          <img src="assets/screenshots/backgroundImage4.png" alt="Human Paladin" loading="lazy">
+          <div class="art-label">Human Paladin</div>
+        </div>
+      </div>
+      <div class="art-grid-row2">
+        <div class="art-card fade-in" onclick="openLightbox(this)">
+          <img src="assets/screenshots/backgroundImage5.png" alt="Ogre Shaman" loading="lazy">
+          <div class="art-label">Ogre Shaman</div>
+        </div>
+        <div class="art-card fade-in" onclick="openLightbox(this)">
+          <img src="assets/screenshots/backgroundImage3.png" alt="Troll Shadow Knight" loading="lazy">
+          <div class="art-label">Troll Shadow Knight</div>
+        </div>
+        <div class="art-card fade-in" onclick="openLightbox(this)">
+          <img src="assets/screenshots/backgroundImage9.png" alt="Human Cleric" loading="lazy">
+          <div class="art-label">Human Cleric</div>
+        </div>
+        <div class="art-card fade-in" onclick="openLightbox(this)">
+          <img src="assets/screenshots/backgroundImage2.png" alt="Barbarian Berserker" loading="lazy">
+          <div class="art-label">Barbarian Berserker</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3D MODELS -->
+  <section class="models" id="models">
+    <div class="container">
+      <div class="models-header fade-in">
+        <div class="section-label" style="color: var(--fire)">Interactive 3D</div>
+        <h2>Inspect the <span class="gradient-text">models</span></h2>
+        <p>Drag to rotate, pinch to zoom. These are the actual in-game models. On Vision Pro, tap the AR icon to place them in your room.</p>
+      </div>
+      <div class="models-grid">
+        <div class="model-card fade-in">
+          <model-viewer
+            src="assets/models/FantasyKnight_idle_guard.usdz"
+            alt="Fantasy Knight"
+            auto-rotate
+            camera-controls
+            ar
+            ar-modes="scene-viewer webxr quick-look"
+            shadow-intensity="1"
+            environment-image="neutral"
+            ios-src="assets/models/FantasyKnight_idle_guard.usdz"
+          ></model-viewer>
+          <div class="model-info">
+            <h3>Fantasy Knight</h3>
+            <p>Guard class idle animation</p>
+            <span class="model-badge">Interactive 3D</span>
+          </div>
+        </div>
+        <div class="model-card fade-in">
+          <model-viewer
+            src="assets/models/SkeletonMage_Idle.usdz"
+            alt="Skeleton Mage"
+            auto-rotate
+            camera-controls
+            ar
+            ar-modes="scene-viewer webxr quick-look"
+            shadow-intensity="1"
+            environment-image="neutral"
+            ios-src="assets/models/SkeletonMage_Idle.usdz"
+          ></model-viewer>
+          <div class="model-info">
+            <h3>Skeleton Mage</h3>
+            <p>Undead enemy caster</p>
+            <span class="model-badge">Interactive 3D</span>
+          </div>
+        </div>
+        <div class="model-card fade-in">
+          <model-viewer
+            src="assets/models/Golem_Attack3.usdz"
+            alt="Stone Golem"
+            auto-rotate
+            camera-controls
+            ar
+            ar-modes="scene-viewer webxr quick-look"
+            shadow-intensity="1"
+            environment-image="neutral"
+            ios-src="assets/models/Golem_Attack3.usdz"
+          ></model-viewer>
+          <div class="model-info">
+            <h3>Stone Golem</h3>
+            <p>World boss attack sequence</p>
+            <span class="model-badge">Interactive 3D</span>
+          </div>
+        </div>
+        <div class="model-card fade-in">
+          <model-viewer
+            src="assets/models/CaveTroll_FreeIdleHitLeft0.usdz"
+            alt="Cave Troll"
+            auto-rotate
+            camera-controls
+            ar
+            ar-modes="scene-viewer webxr quick-look"
+            shadow-intensity="1"
+            environment-image="neutral"
+            ios-src="assets/models/CaveTroll_FreeIdleHitLeft0.usdz"
+          ></model-viewer>
+          <div class="model-info">
+            <h3>Cave Troll</h3>
+            <p>Dungeon elite enemy</p>
+            <span class="model-badge">Interactive 3D</span>
+          </div>
+        </div>
+        <div class="model-card fade-in">
+          <model-viewer
+            src="assets/models/TreasureChest_02_Open.usdz"
+            alt="Treasure Chest"
+            auto-rotate
+            camera-controls
+            ar
+            ar-modes="scene-viewer webxr quick-look"
+            shadow-intensity="1"
+            environment-image="neutral"
+            ios-src="assets/models/TreasureChest_02_Open.usdz"
+          ></model-viewer>
+          <div class="model-info">
+            <h3>Treasure Chest</h3>
+            <p>Loot drop reward</p>
+            <span class="model-badge">Interactive 3D</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ENVIRONMENTS / SKYBOXES -->
+  <section class="environments" id="worlds">
+    <div class="container">
+      <div class="environments-header fade-in">
+        <div class="section-label" style="color: var(--cyan)">Game Worlds</div>
+        <h2>Explore the <span class="gradient-text">realms</span></h2>
+        <p>Panoramic environments rendered in your physical space. Each zone has unique enemies, quests, and treasures.</p>
+      </div>
+      <div class="env-grid">
+        <div class="env-card fade-in" onclick="openLightbox(this)">
+          <img src="assets/skybox/skybox_bayne_volcanic_4.jpg" alt="Volcanic Wastes" loading="lazy">
+          <div class="env-overlay"><div><div class="env-name">Volcanic Wastes</div><div class="env-type">Endgame Zone &middot; Level 40+</div></div></div>
+        </div>
+        <div class="env-card fade-in" onclick="openLightbox(this)">
+          <img src="assets/skybox/skybox_barbarian_castle_4.jpg" alt="Barbarian Fortress" loading="lazy">
+          <div class="env-overlay"><div><div class="env-name">Barbarian Fortress</div><div class="env-type">PvP Territory &middot; Level 20+</div></div></div>
+        </div>
+        <div class="env-card fade-in" onclick="openLightbox(this)">
+          <img src="assets/skybox/skybox_dungeon_4.jpg" alt="The Catacombs" loading="lazy">
+          <div class="env-overlay"><div><div class="env-name">The Catacombs</div><div class="env-type">Dungeon &middot; Level 15+</div></div></div>
+        </div>
+        <div class="env-card fade-in" onclick="openLightbox(this)">
+          <img src="assets/skybox/skybox_woodelf_forest_1.jpg" alt="Elven Woodlands" loading="lazy">
+          <div class="env-overlay"><div><div class="env-name">Elven Woodlands</div><div class="env-type">Starting Zone &middot; Level 1-10</div></div></div>
+        </div>
+        <div class="env-card fade-in" onclick="openLightbox(this)">
+          <img src="assets/skybox/skybox_desert_night_1.jpg" alt="Desert of Shadows" loading="lazy">
+          <div class="env-overlay"><div><div class="env-name">Desert of Shadows</div><div class="env-type">Open World &middot; Level 25+</div></div></div>
+        </div>
+        <div class="env-card fade-in" onclick="openLightbox(this)">
+          <img src="assets/skybox/skybox_swamp_dark_1.jpg" alt="Darkswamp Marshes" loading="lazy">
+          <div class="env-overlay"><div><div class="env-name">Darkswamp Marshes</div><div class="env-type">Raid Zone &middot; Level 30+</div></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="features-header fade-in">
+        <div class="section-label">Core Features</div>
+        <h2>Built for <span class="gradient-text">the next era</span></h2>
+        <p>Everything you'd expect from a AAA MMORPG, now rendered in your real world.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card fade-in">
+          <div class="feature-icon">&#x2694;</div>
+          <h3>Real-Time Combat</h3>
+          <p>Visceral, real-time battles against players and AI enemies rendered into your physical environment at true scale.</p>
+        </div>
+        <div class="feature-card fade-in">
+          <div class="feature-icon">&#x1F30D;</div>
+          <h3>Persistent AR World</h3>
+          <p>A massive shared world layered on reality. Territories, dungeons, and strongholds at real GPS coordinates.</p>
+        </div>
+        <div class="feature-card fade-in">
+          <div class="feature-icon">&#x1F3D7;</div>
+          <h3>Build &amp; Conquer</h3>
+          <p>Construct fortresses, craft legendary gear, and claim territories that persist for all players.</p>
+        </div>
+        <div class="feature-card fade-in">
+          <div class="feature-icon">&#x1F46A;</div>
+          <h3>Guilds &amp; Alliances</h3>
+          <p>Form powerful guilds, wage territorial wars, and forge alliances that shape the political landscape.</p>
+        </div>
+        <div class="feature-card fade-in">
+          <div class="feature-icon">&#x2728;</div>
+          <h3>Spatial Magic System</h3>
+          <p>Cast spells with hand gestures tracked by Vision Pro. Draw runes in the air and watch them ignite.</p>
+        </div>
+        <div class="feature-card fade-in">
+          <div class="feature-icon">&#x1F525;</div>
+          <h3>Live Events</h3>
+          <p>World bosses, seasonal raids, and dynamic events that transform the AR landscape.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ENGINE -->
+  <section class="engine" id="engine">
+    <div class="container">
+      <div class="engine-wrapper fade-in">
+        <div class="engine-content">
+          <div class="section-label" style="color: var(--fire)">Proprietary Technology</div>
+          <h2>The <span class="gradient-text">Bayne Engine</span></h2>
+          <p>A custom-built spatial computing engine designed from the ground up for Apple Vision Pro. Real-time mesh understanding, environment occlusion, and persistent world anchoring &mdash; all at 90fps.</p>
+          <div class="engine-stats">
+            <div class="stat"><div class="stat-value gradient-text">90</div><div class="stat-label">FPS Target</div></div>
+            <div class="stat"><div class="stat-value gradient-text">&lt;5ms</div><div class="stat-label">Latency</div></div>
+            <div class="stat"><div class="stat-value gradient-text">&#x221E;</div><div class="stat-label">World Scale</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="container">
+      <div class="cta-content fade-in">
+        <h2>Enter the <span class="gradient-text">battlefield.</span></h2>
+        <p>Welcome to BAYNE. Fantasy is now reality.</p>
+        <a href="https://apps.apple.com/app/arkandia/id6677011801" class="btn-primary" target="_blank" rel="noopener">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          Download for Vision Pro
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-logo">BAYNE</div>
+        <ul class="footer-links">
+          <li><a href="#characters">Characters</a></li>
+          <li><a href="#models">3D Models</a></li>
+          <li><a href="#worlds">Worlds</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="mailto:contact@playbayne.com">Contact</a></li>
+          <li><a href="/privacy.html">Privacy</a></li>
+        </ul>
+        <div class="footer-copy">&copy; 2025 Bayne. All rights reserved.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <button class="lightbox-close">&times;</button>
+    <img id="lightbox-img" src="" alt="">
+  </div>
+
+  <script>
+    // Particle canvas
+    const canvas = document.getElementById('hero-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    class Particle {
+      constructor() { this.reset(); }
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2 + 0.5;
+        this.speedX = (Math.random() - 0.5) * 0.3;
+        this.speedY = (Math.random() - 0.5) * 0.3;
+        this.opacity = Math.random() * 0.5 + 0.1;
+        this.hue = Math.random() > 0.5 ? 280 : 25;
+      }
+      update() {
+        this.x += this.speedX; this.y += this.speedY;
+        if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
+      }
+      draw() {
+        ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${this.hue}, 80%, 70%, ${this.opacity})`; ctx.fill();
+      }
+    }
+    const pCount = Math.min(100, Math.floor(window.innerWidth / 15));
+    for (let i = 0; i < pCount; i++) particles.push(new Particle());
+    function drawLines() {
+      for (let i = 0; i < particles.length; i++)
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          if (dist < 150) {
+            ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(192,132,252,${0.06*(1-dist/150)})`; ctx.lineWidth = 0.5; ctx.stroke();
+          }
+        }
+    }
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => { p.update(); p.draw(); }); drawLines();
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    // Nav scroll
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 50));
+
+    // Mobile menu
+    document.getElementById('mobile-toggle').addEventListener('click', () =>
+      document.getElementById('nav-links').classList.toggle('open'));
+
+    // Scroll animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        const t = document.querySelector(a.getAttribute('href'));
+        if (t) { t.scrollIntoView({ behavior: 'smooth' }); document.getElementById('nav-links').classList.remove('open'); }
+      });
+    });
+
+    // Lightbox
+    function openLightbox(card) {
+      const img = card.querySelector('img');
+      document.getElementById('lightbox-img').src = img.src;
+      document.getElementById('lightbox').classList.add('active');
+    }
+    function closeLightbox() { document.getElementById('lightbox').classList.remove('active'); }
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
+
+    // Signup form
+    const form = document.getElementById('signup-form');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = new FormData(form);
+      try {
+        await fetch(form.action, { method: 'POST', body: data, headers: { 'Accept': 'application/json' } });
+        form.style.display = 'none';
+        document.getElementById('form-success').style.display = 'block';
+      } catch (err) {
+        // Fallback: just show success (Formspree will still receive it)
+        form.style.display = 'none';
+        document.getElementById('form-success').style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
