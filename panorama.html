@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BAYNE — Explore the Realm</title>
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #000; color: #fff; font-family: 'Inter', -apple-system, sans-serif; overflow: hidden; }
+
+    .pano-ui {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 20px 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%);
+      pointer-events: none;
+    }
+    .pano-ui > * { pointer-events: auto; }
+    .pano-back {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: rgba(255,255,255,0.8); font-size: 0.85rem; font-weight: 500;
+      text-decoration: none; transition: color 0.3s;
+    }
+    .pano-back:hover { color: #fff; }
+    .pano-title {
+      font-size: 1.1rem; font-weight: 700; letter-spacing: 0.05em;
+    }
+    .pano-hint {
+      font-size: 0.75rem; color: rgba(255,255,255,0.5);
+      letter-spacing: 0.05em;
+    }
+
+    .pano-nav {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      z-index: 100; display: flex; gap: 8px;
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(20px);
+      padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
+    }
+    .pano-thumb {
+      width: 72px; height: 40px; border-radius: 6px; overflow: hidden;
+      cursor: pointer; border: 2px solid transparent; transition: all 0.3s;
+      opacity: 0.6;
+    }
+    .pano-thumb.active { border-color: #c084fc; opacity: 1; }
+    .pano-thumb:hover { opacity: 1; }
+    .pano-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+    .pano-enter-vr {
+      position: fixed; bottom: 80px; right: 24px; z-index: 100;
+      padding: 12px 24px; background: rgba(192,132,252,0.9); color: #000;
+      border: none; border-radius: 8px; font-size: 0.8rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer;
+      display: none;
+    }
+
+    a-scene { width: 100vw; height: 100vh; }
+  </style>
+</head>
+<body>
+  <div class="pano-ui">
+    <a href="/" class="pano-back">&larr; Back to BAYNE</a>
+    <div class="pano-title" id="pano-title">Volcanic Wastes</div>
+    <div class="pano-hint">Drag to look around &middot; Scroll to zoom</div>
+  </div>
+
+  <div class="pano-nav" id="pano-nav"></div>
+
+  <a-scene
+    embedded
+    vr-mode-ui="enabled: true"
+    loading-screen="dotsColor: #c084fc; backgroundColor: #050507"
+  >
+    <a-assets timeout="30000">
+      <img id="sky-volcanic" src="assets/skybox/skybox_bayne_volcanic_4.jpg" crossorigin="anonymous">
+      <img id="sky-castle" src="assets/skybox/skybox_barbarian_castle_4.jpg" crossorigin="anonymous">
+      <img id="sky-dungeon" src="assets/skybox/skybox_dungeon_4.jpg" crossorigin="anonymous">
+      <img id="sky-forest" src="assets/skybox/skybox_woodelf_forest_1.jpg" crossorigin="anonymous">
+      <img id="sky-desert" src="assets/skybox/skybox_desert_night_1.jpg" crossorigin="anonymous">
+      <img id="sky-swamp" src="assets/skybox/skybox_swamp_dark_1.jpg" crossorigin="anonymous">
+    </a-assets>
+
+    <a-sky id="pano-sky" src="#sky-volcanic" rotation="0 0 0"></a-sky>
+    <a-camera look-controls="reverseMouseDrag: false" wasd-controls="enabled: false"></a-camera>
+  </a-scene>
+
+  <script>
+    const skyboxes = [
+      { id: 'sky-volcanic', name: 'Volcanic Wastes', src: 'assets/skybox/skybox_bayne_volcanic_4.jpg' },
+      { id: 'sky-castle', name: 'Barbarian Fortress', src: 'assets/skybox/skybox_barbarian_castle_4.jpg' },
+      { id: 'sky-dungeon', name: 'The Catacombs', src: 'assets/skybox/skybox_dungeon_4.jpg' },
+      { id: 'sky-forest', name: 'Elven Woodlands', src: 'assets/skybox/skybox_woodelf_forest_1.jpg' },
+      { id: 'sky-desert', name: 'Desert of Shadows', src: 'assets/skybox/skybox_desert_night_1.jpg' },
+      { id: 'sky-swamp', name: 'Darkswamp Marshes', src: 'assets/skybox/skybox_swamp_dark_1.jpg' },
+    ];
+
+    // Check URL param for starting skybox
+    const params = new URLSearchParams(window.location.search);
+    const startSky = params.get('sky') || 'volcanic';
+
+    // Build thumbnail nav
+    const nav = document.getElementById('pano-nav');
+    skyboxes.forEach((s, i) => {
+      const thumb = document.createElement('div');
+      thumb.className = 'pano-thumb' + (s.id.includes(startSky) ? ' active' : '');
+      thumb.innerHTML = `<img src="${s.src}" alt="${s.name}">`;
+      thumb.addEventListener('click', () => switchSky(s, thumb));
+      nav.appendChild(thumb);
+    });
+
+    // Switch skybox
+    function switchSky(skybox, thumbEl) {
+      document.getElementById('pano-sky').setAttribute('src', '#' + skybox.id);
+      document.getElementById('pano-title').textContent = skybox.name;
+      document.querySelectorAll('.pano-thumb').forEach(t => t.classList.remove('active'));
+      if (thumbEl) thumbEl.classList.add('active');
+    }
+
+    // Set initial skybox from URL param
+    const initial = skyboxes.find(s => s.id.includes(startSky));
+    if (initial) {
+      document.getElementById('pano-sky').setAttribute('src', '#' + initial.id);
+      document.getElementById('pano-title').textContent = initial.name;
+    }
+  </script>
+</body>
+</html>

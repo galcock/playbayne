@@ -75,7 +75,11 @@
       border-bottom: 1px solid var(--border);
     }
     nav .container { display: flex; justify-content: space-between; align-items: center; }
-    .nav-logo { font-size: 1.5rem; font-weight: 900; letter-spacing: 0.15em; position: relative; }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 1.5rem; font-weight: 900; letter-spacing: 0.15em; position: relative;
+    }
+    .nav-logo img { height: 36px; width: auto; filter: brightness(0.9) invert(1); }
     .nav-logo::after {
       content: ''; position: absolute; bottom: -4px; left: 0; width: 100%; height: 2px;
       background: linear-gradient(90deg, var(--accent), var(--fire)); opacity: 0.6;
@@ -430,7 +434,7 @@
   <!-- NAV -->
   <nav id="nav">
     <div class="container">
-      <a href="#" class="nav-logo">BAYNE</a>
+      <a href="#" class="nav-logo"><img src="assets/logo.png" alt="Bayne">BAYNE</a>
       <div class="mobile-toggle" id="mobile-toggle" aria-label="Toggle menu">
         <span></span><span></span><span></span>
       </div>
@@ -499,12 +503,15 @@
         <div class="section-label" style="color: #22c55e">Early Access</div>
         <h2>Be first on the <span class="gradient-text">battlefield.</span></h2>
         <p>Join the waitlist and get early access to BAYNE. Be among the first players to step into the AR realm when new updates drop.</p>
-        <form class="signup-form" id="signup-form" action="https://formspree.io/f/xpwdqkzl" method="POST">
+        <form class="signup-form" id="signup-form">
           <div class="form-row">
-            <input type="text" name="name" class="form-input" placeholder="Your name" required>
-            <input type="email" name="email" class="form-input" placeholder="Your email" required>
+            <input type="text" name="name" class="form-input" placeholder="Your name" required autocomplete="given-name">
+            <input type="email" name="email" class="form-input" placeholder="Your email" required autocomplete="email">
           </div>
-          <button type="submit" class="form-submit">Join the Waitlist</button>
+          <button type="submit" class="form-submit" id="submit-btn">
+            <span id="submit-text">Join the Waitlist</span>
+            <span id="submit-loading" style="display:none">Enlisting...</span>
+          </button>
           <p class="form-note">No spam. Just game updates and early access invites.</p>
         </form>
         <div class="form-success" id="form-success">You're in! Watch your inbox for updates from the battlefield.</div>
@@ -526,34 +533,34 @@
           <div class="art-label">Barbarian Warrior</div>
         </div>
         <div class="art-card fade-in" onclick="openLightbox(this)">
-          <img src="assets/screenshots/backgroundImage10.png" alt="Wood Elf Enchanter" loading="lazy">
-          <div class="art-label">Wood Elf Enchanter</div>
-        </div>
-        <div class="art-card fade-in" onclick="openLightbox(this)">
-          <img src="assets/screenshots/backgroundImage7.png" alt="Dark Elf Rogue" loading="lazy">
+          <img src="assets/screenshots/backgroundImage2.png" alt="Dark Elf Rogue" loading="lazy">
           <div class="art-label">Dark Elf Rogue</div>
         </div>
         <div class="art-card fade-in" onclick="openLightbox(this)">
-          <img src="assets/screenshots/backgroundImage4.png" alt="Human Paladin" loading="lazy">
+          <img src="assets/screenshots/backgroundImage3.png" alt="Human Paladin" loading="lazy">
           <div class="art-label">Human Paladin</div>
+        </div>
+        <div class="art-card fade-in" onclick="openLightbox(this)">
+          <img src="assets/screenshots/backgroundImage4.png" alt="Wood Elf Ranger" loading="lazy">
+          <div class="art-label">Wood Elf Ranger</div>
         </div>
       </div>
       <div class="art-grid-row2">
         <div class="art-card fade-in" onclick="openLightbox(this)">
-          <img src="assets/screenshots/backgroundImage5.png" alt="Ogre Shaman" loading="lazy">
-          <div class="art-label">Ogre Shaman</div>
+          <img src="assets/screenshots/backgroundImage6.png" alt="Human Magician" loading="lazy">
+          <div class="art-label">Human Magician</div>
         </div>
         <div class="art-card fade-in" onclick="openLightbox(this)">
-          <img src="assets/screenshots/backgroundImage3.png" alt="Troll Shadow Knight" loading="lazy">
-          <div class="art-label">Troll Shadow Knight</div>
+          <img src="assets/screenshots/backgroundImage7.png" alt="Dark Elf Shadow Knight" loading="lazy">
+          <div class="art-label">Dark Elf Shadow Knight</div>
         </div>
         <div class="art-card fade-in" onclick="openLightbox(this)">
           <img src="assets/screenshots/backgroundImage9.png" alt="Human Cleric" loading="lazy">
           <div class="art-label">Human Cleric</div>
         </div>
         <div class="art-card fade-in" onclick="openLightbox(this)">
-          <img src="assets/screenshots/backgroundImage2.png" alt="Barbarian Berserker" loading="lazy">
-          <div class="art-label">Barbarian Berserker</div>
+          <img src="assets/screenshots/backgroundImage10.png" alt="Wood Elf Enchanter" loading="lazy">
+          <div class="art-label">Wood Elf Enchanter</div>
         </div>
       </div>
     </div>
@@ -671,30 +678,30 @@
         <p>Panoramic environments rendered in your physical space. Each zone has unique enemies, quests, and treasures.</p>
       </div>
       <div class="env-grid">
-        <div class="env-card fade-in" onclick="openLightbox(this)">
+        <a href="panorama.html?sky=volcanic" class="env-card fade-in">
           <img src="assets/skybox/skybox_bayne_volcanic_4.jpg" alt="Volcanic Wastes" loading="lazy">
-          <div class="env-overlay"><div><div class="env-name">Volcanic Wastes</div><div class="env-type">Endgame Zone &middot; Level 40+</div></div></div>
-        </div>
-        <div class="env-card fade-in" onclick="openLightbox(this)">
+          <div class="env-overlay"><div><div class="env-name">Volcanic Wastes</div><div class="env-type">Endgame Zone &middot; Level 40+ &middot; <strong>Enter 360&deg;</strong></div></div></div>
+        </a>
+        <a href="panorama.html?sky=castle" class="env-card fade-in">
           <img src="assets/skybox/skybox_barbarian_castle_4.jpg" alt="Barbarian Fortress" loading="lazy">
-          <div class="env-overlay"><div><div class="env-name">Barbarian Fortress</div><div class="env-type">PvP Territory &middot; Level 20+</div></div></div>
-        </div>
-        <div class="env-card fade-in" onclick="openLightbox(this)">
+          <div class="env-overlay"><div><div class="env-name">Barbarian Fortress</div><div class="env-type">PvP Territory &middot; Level 20+ &middot; <strong>Enter 360&deg;</strong></div></div></div>
+        </a>
+        <a href="panorama.html?sky=dungeon" class="env-card fade-in">
           <img src="assets/skybox/skybox_dungeon_4.jpg" alt="The Catacombs" loading="lazy">
-          <div class="env-overlay"><div><div class="env-name">The Catacombs</div><div class="env-type">Dungeon &middot; Level 15+</div></div></div>
-        </div>
-        <div class="env-card fade-in" onclick="openLightbox(this)">
+          <div class="env-overlay"><div><div class="env-name">The Catacombs</div><div class="env-type">Dungeon &middot; Level 15+ &middot; <strong>Enter 360&deg;</strong></div></div></div>
+        </a>
+        <a href="panorama.html?sky=forest" class="env-card fade-in">
           <img src="assets/skybox/skybox_woodelf_forest_1.jpg" alt="Elven Woodlands" loading="lazy">
-          <div class="env-overlay"><div><div class="env-name">Elven Woodlands</div><div class="env-type">Starting Zone &middot; Level 1-10</div></div></div>
-        </div>
-        <div class="env-card fade-in" onclick="openLightbox(this)">
+          <div class="env-overlay"><div><div class="env-name">Elven Woodlands</div><div class="env-type">Starting Zone &middot; Level 1-10 &middot; <strong>Enter 360&deg;</strong></div></div></div>
+        </a>
+        <a href="panorama.html?sky=desert" class="env-card fade-in">
           <img src="assets/skybox/skybox_desert_night_1.jpg" alt="Desert of Shadows" loading="lazy">
-          <div class="env-overlay"><div><div class="env-name">Desert of Shadows</div><div class="env-type">Open World &middot; Level 25+</div></div></div>
-        </div>
-        <div class="env-card fade-in" onclick="openLightbox(this)">
+          <div class="env-overlay"><div><div class="env-name">Desert of Shadows</div><div class="env-type">Open World &middot; Level 25+ &middot; <strong>Enter 360&deg;</strong></div></div></div>
+        </a>
+        <a href="panorama.html?sky=swamp" class="env-card fade-in">
           <img src="assets/skybox/skybox_swamp_dark_1.jpg" alt="Darkswamp Marshes" loading="lazy">
-          <div class="env-overlay"><div><div class="env-name">Darkswamp Marshes</div><div class="env-type">Raid Zone &middot; Level 30+</div></div></div>
-        </div>
+          <div class="env-overlay"><div><div class="env-name">Darkswamp Marshes</div><div class="env-type">Raid Zone &middot; Level 30+ &middot; <strong>Enter 360&deg;</strong></div></div></div>
+        </a>
       </div>
     </div>
   </section>
@@ -879,20 +886,34 @@
     function closeLightbox() { document.getElementById('lightbox').classList.remove('active'); }
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
 
-    // Signup form
+    // Signup form — saves to Google Sheets via Apps Script web app
+    // You'll need to set up a Google Apps Script and replace this URL
+    const SHEET_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
     const form = document.getElementById('signup-form');
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const data = new FormData(form);
+      const btn = document.getElementById('submit-btn');
+      document.getElementById('submit-text').style.display = 'none';
+      document.getElementById('submit-loading').style.display = 'inline';
+      btn.disabled = true;
+      const name = form.querySelector('[name="name"]').value;
+      const email = form.querySelector('[name="email"]').value;
       try {
-        await fetch(form.action, { method: 'POST', body: data, headers: { 'Accept': 'application/json' } });
-        form.style.display = 'none';
-        document.getElementById('form-success').style.display = 'block';
-      } catch (err) {
-        // Fallback: just show success (Formspree will still receive it)
-        form.style.display = 'none';
-        document.getElementById('form-success').style.display = 'block';
-      }
+        // Store locally as backup
+        const signups = JSON.parse(localStorage.getItem('bayne_signups') || '[]');
+        signups.push({ name, email, date: new Date().toISOString() });
+        localStorage.setItem('bayne_signups', JSON.stringify(signups));
+        // Try to send to backend (replace SHEET_URL with your real endpoint)
+        if (!SHEET_URL.includes('YOUR_SCRIPT_ID')) {
+          await fetch(SHEET_URL, {
+            method: 'POST', mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email })
+          });
+        }
+      } catch (err) { /* localStorage backup already saved */ }
+      form.style.display = 'none';
+      document.getElementById('form-success').style.display = 'block';
     });
   </script>
 </body>
