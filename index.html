@@ -252,7 +252,7 @@
       font-size: clamp(2.5rem,5vw,3.5rem); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 16px;
     }
     .models-header p { font-size: 1.1rem; color: var(--text-dim); max-width: 550px; margin: 0 auto; }
-    .models-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .models-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
     .model-card {
       border-radius: 16px; border: 1px solid var(--border); background: var(--bg-elevated);
       overflow: hidden; transition: all 0.4s;
@@ -398,7 +398,8 @@
 
     /* RESPONSIVE */
     @media (max-width: 1024px) {
-      .features-grid, .models-grid { grid-template-columns: repeat(2, 1fr); }
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .models-grid { grid-template-columns: repeat(3, 1fr); }
       .art-grid, .art-grid-row2 { grid-template-columns: repeat(2, 1fr); }
       .engine-wrapper { padding: 60px; }
     }
@@ -410,7 +411,8 @@
         border-bottom: 1px solid var(--border); gap: 20px;
       }
       .mobile-toggle { display: flex; }
-      .features-grid, .models-grid { grid-template-columns: 1fr; }
+      .features-grid { grid-template-columns: 1fr; }
+      .models-grid { grid-template-columns: repeat(2, 1fr); }
       .env-grid { grid-template-columns: 1fr; }
       .art-grid, .art-grid-row2 { grid-template-columns: repeat(2, 1fr); }
       .engine-wrapper { padding: 40px 24px; }
@@ -575,123 +577,69 @@
         <p>Drag to rotate, pinch to zoom. These are the actual in-game models. On Vision Pro, tap the AR icon to place them in your room.</p>
       </div>
       <div class="models-grid">
-        <div class="model-card fade-in" style="grid-column: span 2;">
-          <model-viewer
-            src="assets/models/SkeletonKing.glb"
-            alt="Skeleton King — Interactive 3D"
-            autoplay
-            auto-rotate
-            camera-controls
-            ar
-            ar-modes="scene-viewer webxr quick-look"
-            shadow-intensity="1.5"
-            environment-image="neutral"
-            camera-orbit="30deg 75deg 2.5m"
-            min-camera-orbit="auto auto 1m"
-            max-camera-orbit="auto auto 10m"
-            style="height: 450px;"
-            ios-src="assets/models/SkeletonKing_Idle.usdz"
-          ></model-viewer>
-          <div class="model-info">
-            <h3>Skeleton King</h3>
-            <p>Undead boss &mdash; drag to rotate, scroll to zoom</p>
-            <span class="model-badge">Interactive 3D &middot; Animated</span>
-          </div>
+        <div class="model-card fade-in">
+          <model-viewer src="assets/models/SkeletonKing.glb" alt="Skeleton King" autoplay auto-rotate camera-controls ar ar-modes="scene-viewer webxr quick-look" shadow-intensity="1" environment-image="neutral" ios-src="assets/models/SkeletonKing_Idle.usdz"></model-viewer>
+          <div class="model-info"><h3>Skeleton King</h3><p>Undead boss</p><span class="model-badge">Interactive 3D</span></div>
         </div>
         <div class="model-card fade-in">
-          <model-viewer
-            src="assets/models/FantasyKnight_Idle.glb"
-            alt="Fantasy Knight"
-            autoplay
-            auto-rotate
-            camera-controls
-            ar
-            ar-modes="scene-viewer webxr quick-look"
-            shadow-intensity="1"
-            environment-image="neutral"
-            ios-src="assets/models/FantasyKnight_Idle.usdz"
-          ></model-viewer>
-          <div class="model-info">
-            <h3>Fantasy Knight</h3>
-            <p>Idle animation with full armor textures</p>
-            <span class="model-badge">Interactive 3D &middot; Animated</span>
-          </div>
+          <model-viewer src="assets/models/SkeletonWarrior_Idle.glb" alt="Skeleton Warrior" autoplay auto-rotate camera-controls ar ar-modes="scene-viewer webxr quick-look" shadow-intensity="1" environment-image="neutral"></model-viewer>
+          <div class="model-info"><h3>Skeleton Warrior</h3><p>Undead melee fighter</p><span class="model-badge">Interactive 3D</span></div>
         </div>
         <div class="model-card fade-in">
-          <model-viewer
-            src="assets/models/SkeletonMage_Idle.glb"
-            alt="Skeleton Mage"
-            autoplay
-            auto-rotate
-            camera-controls
-            ar
-            ar-modes="scene-viewer webxr quick-look"
-            shadow-intensity="1"
-            environment-image="neutral"
-            ios-src="assets/models/SkeletonMage_Idle.usdz"
-          ></model-viewer>
-          <div class="model-info">
-            <h3>Skeleton Mage</h3>
-            <p>Undead caster idle with spell effects</p>
-            <span class="model-badge">Interactive 3D &middot; Animated</span>
-          </div>
+          <model-viewer src="assets/models/SkeletonMage_Idle.glb" alt="Skeleton Mage" autoplay auto-rotate camera-controls ar ar-modes="scene-viewer webxr quick-look" shadow-intensity="1" environment-image="neutral" ios-src="assets/models/SkeletonMage_Idle.usdz"></model-viewer>
+          <div class="model-info"><h3>Skeleton Mage</h3><p>Undead caster</p><span class="model-badge">Interactive 3D</span></div>
         </div>
         <div class="model-card fade-in">
-          <model-viewer
-            src="assets/models/Golem_Idle.glb"
-            alt="Stone Golem"
-            autoplay
-            auto-rotate
-            camera-controls
-            ar
-            ar-modes="scene-viewer webxr quick-look"
-            shadow-intensity="1"
-            environment-image="neutral"
-            ios-src="assets/models/Golem_Idle.usdz"
-          ></model-viewer>
-          <div class="model-info">
-            <h3>Stone Golem</h3>
-            <p>World boss breathing idle animation</p>
-            <span class="model-badge">Interactive 3D &middot; Animated</span>
-          </div>
+          <model-viewer src="assets/models/SkeletonBase_Idle.glb" alt="Skeleton Base" autoplay auto-rotate camera-controls ar ar-modes="scene-viewer webxr quick-look" shadow-intensity="1" environment-image="neutral" ios-src="assets/models/SkeletonBase_Idle.usdz"></model-viewer>
+          <div class="model-info"><h3>Skeleton Base</h3><p>Basic undead minion</p><span class="model-badge">Interactive 3D</span></div>
         </div>
         <div class="model-card fade-in">
-          <model-viewer
-            src="assets/models/CavalryArmor_Idle.glb"
-            alt="Cavalry Knight"
-            autoplay
-            auto-rotate
-            camera-controls
-            ar
-            ar-modes="scene-viewer webxr quick-look"
-            shadow-intensity="1"
-            environment-image="neutral"
-            ios-src="assets/models/CavalryArmor_Idle.usdz"
-          ></model-viewer>
-          <div class="model-info">
-            <h3>Cavalry Knight</h3>
-            <p>Armored knight idle with full plate textures</p>
-            <span class="model-badge">Interactive 3D &middot; Animated</span>
-          </div>
+          <model-viewer src="assets/models/SkeletonKnight_Idle.glb" alt="Skeleton Knight" autoplay auto-rotate camera-controls ar ar-modes="scene-viewer webxr quick-look" shadow-intensity="1" environment-image="neutral" ios-src="assets/models/SkeletonKnight_Idle.usdz"></model-viewer>
+          <div class="model-info"><h3>Skeleton Knight</h3><p>Armored undead elite</p><span class="model-badge">Interactive 3D</span></div>
         </div>
         <div class="model-card fade-in">
-          <model-viewer
-            src="assets/models/TreasureChest_02_Open.glb"
-            alt="Treasure Chest"
-            autoplay
-            auto-rotate
-            camera-controls
-            ar
-            ar-modes="scene-viewer webxr quick-look"
-            shadow-intensity="1"
-            environment-image="neutral"
-            ios-src="assets/models/TreasureChest_02_Open.usdz"
-          ></model-viewer>
-          <div class="model-info">
-            <h3>Treasure Chest</h3>
-            <p>Loot drop reward with open animation</p>
-            <span class="model-badge">Interactive 3D &middot; Animated</span>
-          </div>
+          <model-viewer src="assets/models/SkeletonArcher_Idle.glb" alt="Skeleton Archer" autoplay auto-rotate camera-controls ar ar-modes="scene-viewer webxr quick-look" shadow-intensity="1" environment-image="neutral" ios-src="assets/models/SkeletonArcher_Idle.usdz"></model-viewer>
+          <div class="model-info"><h3>Skeleton Archer</h3><p>Ranged undead attacker</p><span class="model-badge">Interactive 3D</span></div>
+        </div>
+        <div class="model-card fade-in">
+          <model-viewer src="assets/models/FantasyKnight_Idle.glb" alt="Fantasy Knight" autoplay auto-rotate camera-controls ar ar-modes="scene-viewer webxr quick-look" shadow-intensity="1" environment-image="neutral" ios-src="assets/models/FantasyKnight_Idle.usdz"></model-viewer>
+          <div class="model-info"><h3>Fantasy Knight</h3><p>Guard class knight</p><span class="model-badge">Interactive 3D</span></div>
+        </div>
+        <div class="model-card fade-in">
+          <model-viewer src="assets/models/GuardKnight_Idle.glb" alt="Guard Knight" autoplay auto-rotate camera-controls ar ar-modes="scene-viewer webxr quick-look" shadow-intensity="1" environment-image="neutral" ios-src="assets/models/GuardKnight_Idle.usdz"></model-viewer>
+          <div class="model-info"><h3>Guard Knight</h3><p>Heavy plate defender</p><span class="model-badge">Interactive 3D</span></div>
+        </div>
+        <div class="model-card fade-in">
+          <model-viewer src="assets/models/CavalryArmor_Idle.glb" alt="Cavalry Knight" autoplay auto-rotate camera-controls ar ar-modes="scene-viewer webxr quick-look" shadow-intensity="1" environment-image="neutral" ios-src="assets/models/CavalryArmor_Idle.usdz"></model-viewer>
+          <div class="model-info"><h3>Cavalry Knight</h3><p>Mounted warrior armor</p><span class="model-badge">Interactive 3D</span></div>
+        </div>
+        <div class="model-card fade-in">
+          <model-viewer src="assets/models/Mage_Idle.glb" alt="Mage" autoplay auto-rotate camera-controls ar ar-modes="scene-viewer webxr quick-look" shadow-intensity="1" environment-image="neutral" ios-src="assets/models/Mage_Idle.usdz"></model-viewer>
+          <div class="model-info"><h3>Mage</h3><p>Arcane spellcaster</p><span class="model-badge">Interactive 3D</span></div>
+        </div>
+        <div class="model-card fade-in">
+          <model-viewer src="assets/models/Wizard_Walk.glb" alt="Wizard" autoplay auto-rotate camera-controls ar ar-modes="scene-viewer webxr quick-look" shadow-intensity="1" environment-image="neutral" ios-src="assets/models/Wizard_Walk.usdz"></model-viewer>
+          <div class="model-info"><h3>Wizard</h3><p>Walking spell animation</p><span class="model-badge">Interactive 3D</span></div>
+        </div>
+        <div class="model-card fade-in">
+          <model-viewer src="assets/models/Cyclops_Idle.glb" alt="Cyclops" autoplay auto-rotate camera-controls ar ar-modes="scene-viewer webxr quick-look" shadow-intensity="1" environment-image="neutral" ios-src="assets/models/Cyclops_Idle.usdz"></model-viewer>
+          <div class="model-info"><h3>Cyclops</h3><p>Giant one-eyed brute</p><span class="model-badge">Interactive 3D</span></div>
+        </div>
+        <div class="model-card fade-in">
+          <model-viewer src="assets/models/FrogWarrior_Idle.glb" alt="Frog Warrior" autoplay auto-rotate camera-controls ar ar-modes="scene-viewer webxr quick-look" shadow-intensity="1" environment-image="neutral" ios-src="assets/models/FrogWarrior_Idle.usdz"></model-viewer>
+          <div class="model-info"><h3>Frog Warrior</h3><p>Amphibian fighter</p><span class="model-badge">Interactive 3D</span></div>
+        </div>
+        <div class="model-card fade-in">
+          <model-viewer src="assets/models/Spider_Idle.glb" alt="Spider" autoplay auto-rotate camera-controls ar ar-modes="scene-viewer webxr quick-look" shadow-intensity="1" environment-image="neutral" ios-src="assets/models/Spider_Idle.usdz"></model-viewer>
+          <div class="model-info"><h3>Spider</h3><p>Dungeon crawler</p><span class="model-badge">Interactive 3D</span></div>
+        </div>
+        <div class="model-card fade-in">
+          <model-viewer src="assets/models/Golem_Idle.glb" alt="Stone Golem" autoplay auto-rotate camera-controls ar ar-modes="scene-viewer webxr quick-look" shadow-intensity="1" environment-image="neutral" ios-src="assets/models/Golem_Idle.usdz"></model-viewer>
+          <div class="model-info"><h3>Stone Golem</h3><p>World boss</p><span class="model-badge">Interactive 3D</span></div>
+        </div>
+        <div class="model-card fade-in">
+          <model-viewer src="assets/models/TreasureChest_02_Open.glb" alt="Treasure Chest" autoplay auto-rotate camera-controls ar ar-modes="scene-viewer webxr quick-look" shadow-intensity="1" environment-image="neutral" ios-src="assets/models/TreasureChest_02_Open.usdz"></model-viewer>
+          <div class="model-info"><h3>Treasure Chest</h3><p>Loot drop reward</p><span class="model-badge">Interactive 3D</span></div>
         </div>
       </div>
     </div>
