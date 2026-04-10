@@ -280,6 +280,12 @@
     }
     .char-card .char-label .char-name { font-weight: 700; font-size: 0.7rem; }
     .char-card .char-label .char-meta { color: var(--text-dim); font-size: 0.6rem; margin-top: 2px; }
+    .char-card video {
+      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+      opacity: 0; transition: opacity 0.3s; z-index: 1;
+    }
+    .char-card:hover video { opacity: 1; }
+    .char-card:hover img { opacity: 0; }
     .char-count {
       text-align: center; font-size: 0.8rem; color: var(--text-dim); margin-top: 20px;
     }
@@ -665,6 +671,10 @@
           <div class="model-info"><h3>Spider</h3></div>
         </div>
         <div class="model-card fade-in">
+          <model-viewer src="assets/models/Troll_Idle.glb" alt="Troll" autoplay auto-rotate camera-controls ar ar-modes="scene-viewer webxr quick-look" shadow-intensity="1" environment-image="neutral"></model-viewer>
+          <div class="model-info"><h3>Troll</h3></div>
+        </div>
+        <div class="model-card fade-in">
           <model-viewer src="assets/models/Cave_Troll.glb" alt="Cave Troll" autoplay auto-rotate camera-controls ar ar-modes="scene-viewer webxr quick-look" shadow-intensity="1" environment-image="neutral"></model-viewer>
           <div class="model-info"><h3>Cave Troll</h3></div>
         </div>
@@ -902,7 +912,17 @@
         const card = document.createElement('div');
         card.className = 'char-card';
         card.onclick = function() { openLightbox(this); };
-        card.innerHTML = `<img src="assets/characters/${file}" alt="${gender} ${race} ${cls}" loading="lazy"><div class="char-label"><div class="char-name">${race} ${cls}</div><div class="char-meta">${gender}</div></div>`;
+        const vidFile = file.replace('.webp', '.mp4');
+        card.innerHTML = `<img src="assets/characters/${file}" alt="${gender} ${race} ${cls}" loading="lazy"><video src="assets/characters/${vidFile}" loop muted playsinline preload="none"></video><div class="char-label"><div class="char-name">${race} ${cls}</div><div class="char-meta">${gender}</div></div>`;
+        // Play video on hover
+        card.addEventListener('mouseenter', () => {
+          const v = card.querySelector('video');
+          if (v) v.play().catch(() => {});
+        });
+        card.addEventListener('mouseleave', () => {
+          const v = card.querySelector('video');
+          if (v) { v.pause(); v.currentTime = 0; }
+        });
         grid.appendChild(card);
       });
       countEl.textContent = `Showing ${shown} of ${CHARS.length} characters`;
